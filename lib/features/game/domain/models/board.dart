@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'piece.dart';
-import 'word_checker.dart';
 import 'scoring_system.dart';
 import 'game_results.dart';
 
@@ -72,7 +71,7 @@ class Board with _$Board {
     );
   }
 
-  ClearedLinesResult clearLinesAndCalculateScore() {
+  ClearedLinesResult clearLinesAndCalculateScore(bool Function(String) isValidWord) {
     var newGrid = List<List<CellData?>>.generate(
       rows,
       (i) => List<CellData?>.from(grid[i], growable: false),
@@ -80,7 +79,7 @@ class Board with _$Board {
     );
 
     // Find words in the grid
-    var wordMatches = _findWords(newGrid);
+    var wordMatches = _findWords(newGrid, isValidWord);
     
     if (wordMatches.isNotEmpty) {
       // Calculate word scores
@@ -173,7 +172,7 @@ class Board with _$Board {
     return CompleteLinesResult(resultGrid, clearedLines.length);
   }
 
-  List<WordMatch> _findWords(List<List<CellData?>> grid) {
+  List<WordMatch> _findWords(List<List<CellData?>> grid, bool Function(String) isValidWord) {
     var matches = <WordMatch>[];
     
     // Check horizontal words
@@ -186,7 +185,7 @@ class Board with _$Board {
           word += grid[row][col]!.letter!;
           positions.add(Position(row, col));
         } else if (word.isNotEmpty) {
-          if (WordChecker.isValidWord(word)) {
+          if (isValidWord(word)) {
             matches.add(WordMatch(
               positions: List.from(positions),
               word: word,
@@ -199,7 +198,7 @@ class Board with _$Board {
       }
       
       // Check word at end of row
-      if (word.isNotEmpty && WordChecker.isValidWord(word)) {
+      if (word.isNotEmpty && isValidWord(word)) {
         matches.add(WordMatch(
           positions: List.from(positions),
           word: word,
@@ -218,7 +217,7 @@ class Board with _$Board {
           word += grid[row][col]!.letter!;
           positions.add(Position(row, col));
         } else if (word.isNotEmpty) {
-          if (WordChecker.isValidWord(word)) {
+          if (isValidWord(word)) {
             matches.add(WordMatch(
               positions: List.from(positions),
               word: word,
@@ -231,7 +230,7 @@ class Board with _$Board {
       }
       
       // Check word at end of column
-      if (word.isNotEmpty && WordChecker.isValidWord(word)) {
+      if (word.isNotEmpty && isValidWord(word)) {
         matches.add(WordMatch(
           positions: List.from(positions),
           word: word,
