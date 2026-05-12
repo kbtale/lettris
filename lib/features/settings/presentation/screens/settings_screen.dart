@@ -16,85 +16,118 @@ class SettingsScreen extends ConsumerWidget {
     final controller = ref.read(settingsControllerProvider.notifier);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Settings'),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-      ),
-      backgroundColor: Colors.transparent,
-      body: Center(
-        child: GlassmorphicContainer(
-          blur: 15,
-          opacity: 0.1,
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Game Settings',
-                  style: Theme.of(context).textTheme.headlineSmall,
-                ),
-                const SizedBox(height: 24),
-                SettingsSwitch(
-                  title: 'Show Animations',
-                  value: settings.showAnimations,
-                  onChanged: (_) => controller.toggleAnimations(),
-                ),
-                const SizedBox(height: 16),
-                SettingsSwitch(
-                  title: 'Enable T-Spins',
-                  value: settings.enableTSpins,
-                  onChanged: (_) => controller.toggleTSpins(),
-                ),
-                const SizedBox(height: 16),
-                SettingsSwitch(
-                  title: 'Show Ghost Piece',
-                  value: settings.showGhostPiece,
-                  onChanged: (_) => controller.toggleGhostPiece(),
-                ),
-                const SizedBox(height: 24),
-                Text(
-                  'Rotation Direction',
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-                const SizedBox(height: 8),
-                Wrap(
-                  spacing: 8,
-                  children: RotationDirection.values.map((direction) {
-                    return NeumorphicButton(
-                      width: 120,
-                      onPressed: () => controller.setRotationDirection(direction),
-                      child: Text(
-                        direction.name,
-                        style: TextStyle(
-                          color: settings.rotationDirection == direction
-                              ? Theme.of(context).colorScheme.primary
-                              : null,
-                        ),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Colors.blue.shade900,
+              Colors.purple.shade900,
+            ],
+          ),
+        ),
+        child: SafeArea(
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
+                child: Row(
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.arrow_back, color: Colors.white),
+                      onPressed: () => Navigator.pop(context),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Settings',
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
                       ),
-                    );
-                  }).toList(),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 24),
-                Text(
-                  'Touch Sensitivity',
-                  style: Theme.of(context).textTheme.titleMedium,
+              ),
+              Expanded(
+                child: Center(
+                  child: GlassmorphicContainer(
+                    blur: 15,
+                    opacity: 0.1,
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.all(24),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Game Settings',
+                            style: Theme.of(context).textTheme.headlineSmall,
+                          ),
+                          const SizedBox(height: 24),
+                          SettingsSwitch(
+                            title: 'Show Animations',
+                            value: settings.showAnimations,
+                            onChanged: (_) => controller.toggleAnimations(),
+                          ),
+                          const SizedBox(height: 16),
+                          SettingsSwitch(
+                            title: 'Enable T-Spins',
+                            value: settings.enableTSpins,
+                            onChanged: (_) => controller.toggleTSpins(),
+                          ),
+                          const SizedBox(height: 16),
+                          SettingsSwitch(
+                            title: 'Show Ghost Piece',
+                            value: settings.showGhostPiece,
+                            onChanged: (_) => controller.toggleGhostPiece(),
+                          ),
+                          const SizedBox(height: 24),
+                          Text(
+                            'Rotation Direction',
+                            style: Theme.of(context).textTheme.titleMedium,
+                          ),
+                          const SizedBox(height: 8),
+                          Wrap(
+                            spacing: 8,
+                            children: RotationDirection.values.map((direction) {
+                              return NeumorphicButton(
+                                width: 120,
+                                onPressed: () => controller.setRotationDirection(direction),
+                                child: Text(
+                                  direction.name,
+                                  style: TextStyle(
+                                    color: settings.rotationDirection == direction
+                                        ? Theme.of(context).colorScheme.primary
+                                        : null,
+                                  ),
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                          const SizedBox(height: 24),
+                          Text(
+                            'Touch Sensitivity',
+                            style: Theme.of(context).textTheme.titleMedium,
+                          ),
+                          const SizedBox(height: 8),
+                          SettingsSlider(
+                            value: settings.touchSensitivity,
+                            onChanged: controller.setTouchSensitivity,
+                          ),
+                          const SizedBox(height: 24),
+                          Text(
+                            'Controls',
+                            style: Theme.of(context).textTheme.titleMedium,
+                          ),
+                          const SizedBox(height: 16),
+                          // TODO: Implement control customization UI
+                        ],
+                      ),
+                    ),
+                  ),
                 ),
-                const SizedBox(height: 8),
-                SettingsSlider(
-                  value: settings.touchSensitivity,
-                  onChanged: controller.setTouchSensitivity,
-                ),
-                const SizedBox(height: 24),
-                Text(
-                  'Controls',
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-                const SizedBox(height: 16),
-                // TODO: Implement control customization UI
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),

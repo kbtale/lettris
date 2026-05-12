@@ -31,11 +31,18 @@ Lettris combines the excitement of Tetris with word-building mechanics. Here's h
       content: '''
 # Game Controls
 
+## Touch Screen
 - Swipe left/right to move pieces
 - Swipe down to soft drop
 - Tap to rotate clockwise
-- Double tap to rotate counter-clockwise
 - Swipe up to hold piece
+
+## Keyboard (Desktop/Web)
+- Arrow Left / Right: Move Left / Right
+- Arrow Up: Rotate clockwise
+- Arrow Down: Soft drop
+- Spacebar: Hard drop
+- Shift / C: Hold piece
 ''',
     ),
     const TutorialPage(
@@ -72,70 +79,103 @@ T-spins are special moves that can be performed with T-shaped pieces:
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Tutorial'),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-      ),
-      backgroundColor: Colors.transparent,
-      body: Column(
-        children: [
-          Expanded(
-            child: GlassmorphicContainer(
-              blur: 15,
-              opacity: 0.1,
-              child: Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Text(
-                      _pages[_currentPage].title,
-                      style: Theme.of(context).textTheme.headlineSmall,
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Colors.blue.shade900,
+              Colors.purple.shade900,
+            ],
+          ),
+        ),
+        child: SafeArea(
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
+                child: Row(
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.arrow_back, color: Colors.white),
+                      onPressed: () => Navigator.pop(context),
                     ),
-                  ),
-                  Expanded(
-                    child: Markdown(
-                      data: _pages[_currentPage].content,
-                      styleSheet: MarkdownStyleSheet(
-                        h1: Theme.of(context)
-                            .textTheme
-                            .titleLarge!
-                            .copyWith(color: Colors.blue),
-                        h2: Theme.of(context).textTheme.titleMedium,
-                        p: Theme.of(context).textTheme.bodyLarge,
+                    const SizedBox(width: 8),
+                    Text(
+                      'Tutorial',
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                NeumorphicButton(
-                  onPressed: _currentPage > 0 
-                      ? () => _previousPage()
-                      : null,
-                  child: const Icon(Icons.arrow_back),
+              Expanded(
+                child: Column(
+                  children: [
+                    Expanded(
+                      child: GlassmorphicContainer(
+                        blur: 15,
+                        opacity: 0.1,
+                        child: Column(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: Text(
+                                _pages[_currentPage].title,
+                                style: Theme.of(context).textTheme.headlineSmall,
+                              ),
+                            ),
+                            Expanded(
+                              child: Markdown(
+                                data: _pages[_currentPage].content,
+                                styleSheet: MarkdownStyleSheet(
+                                  h1: Theme.of(context)
+                                      .textTheme
+                                      .titleLarge!
+                                      .copyWith(color: Colors.blue),
+                                  h2: Theme.of(context).textTheme.titleMedium,
+                                  p: Theme.of(context).textTheme.bodyLarge,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          NeumorphicButton(
+                            onPressed: _currentPage > 0 
+                                ? () => _previousPage()
+                                : null,
+                            child: const Icon(Icons.arrow_back),
+                          ),
+                          Text('${_currentPage + 1}/${_pages.length}'),
+                          NeumorphicButton(
+                            onPressed: _currentPage < _pages.length - 1
+                                ? () => _nextPage()
+                                : () => Navigator.pop(context),
+                            child: Icon(
+                              _currentPage < _pages.length - 1
+                                  ? Icons.arrow_forward
+                                  : Icons.check,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
-                Text('${_currentPage + 1}/${_pages.length}'),
-                NeumorphicButton(
-                  onPressed: _currentPage < _pages.length - 1
-                      ? () => _nextPage()
-                      : () => Navigator.pop(context),
-                  child: Icon(
-                    _currentPage < _pages.length - 1
-                        ? Icons.arrow_forward
-                        : Icons.check,
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
