@@ -114,6 +114,24 @@ class SettingsScreen extends ConsumerWidget {
                             value: settings.touchSensitivity,
                             onChanged: controller.setTouchSensitivity,
                           ),
+                          const SizedBox(height: 24),
+                          Text(
+                            'Controls Customization',
+                            style: Theme.of(context).textTheme.titleMedium,
+                          ),
+                          const SizedBox(height: 16),
+                          ..._buildControlsList(context, ref, settings, controller),
+                          const SizedBox(height: 24),
+                          Center(
+                            child: NeumorphicButton(
+                              width: 200,
+                              onPressed: () => controller.resetControls(),
+                              child: const Text(
+                                'Reset to Defaults',
+                                style: TextStyle(color: Colors.redAccent),
+                              ),
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -124,6 +142,132 @@ class SettingsScreen extends ConsumerWidget {
           ),
         ),
       ),
+    );
+  }
+
+  List<Widget> _buildControlsList(
+    BuildContext context,
+    WidgetRef ref,
+    GameSettings settings,
+    SettingsController controller,
+  ) {
+    final actions = {
+      'move_left': 'Move Left',
+      'move_right': 'Move Right',
+      'rotate': 'Rotate',
+      'soft_drop': 'Soft Drop',
+      'hard_drop': 'Hard Drop',
+      'hold': 'Hold Piece',
+    };
+
+    return actions.entries.map((entry) {
+      final action = entry.key;
+      final name = entry.value;
+      final currentKey = settings.customControls[action] ?? _getDefaultKeyLabel(action);
+
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 6.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              name,
+              style: const TextStyle(fontSize: 16, color: Colors.white),
+            ),
+            NeumorphicButton(
+              width: 150,
+              onPressed: () => _showRebindDialog(context, controller, action, name),
+              child: Text(
+                currentKey,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.blue,
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    }).toList();
+  }
+
+  String _getDefaultKeyLabel(String action) {
+    switch (action) {
+      case 'move_left':
+        return 'Arrow Left';
+      case 'move_right':
+        return 'Arrow Right';
+      case 'rotate':
+        return 'Arrow Up';
+      case 'soft_drop':
+        return 'Arrow Down';
+      case 'hard_drop':
+        return 'Space';
+      case 'hold':
+        return 'C';
+      default:
+        return 'Unbound';
+    }
+  }
+
+  void _showRebindDialog(
+    BuildContext context,
+    SettingsController controller,
+    String action,
+    String actionName,
+  ) {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (context) {
+        return Focus(
+          autofocus: true,
+          onKeyEvent: (node, event) {
+            if (event is KeyDownEvent) {
+              final label = event.logicalKey.keyLabel;
+              controller.updateControl(action, label);
+              Navigator.pop(context);
+              return KeyEventResult.handled;
+            }
+            return KeyEventResult.ignored;
+          },
+          child: AlertDialog(
+            backgroundColor: const Color(0xFF162033),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(15),
+            ),
+            title: Text(
+              'Rebind $actionName',
+              style: const TextStyle(color: Colors.white),
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(
+                  Icons.keyboard,
+                  size: 48,
+                  color: Colors.blue,
+                ),
+                const SizedBox(height: 16),
+                const Text(
+                  'Press any key on your keyboard...',
+                  style: TextStyle(color: Colors.white70),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 24),
+                NeumorphicButton(
+                  width: 100,
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text(
+                    'Cancel',
+                    style: TextStyle(color: Colors.white54),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }

@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../domain/models/game_settings.dart';
@@ -20,20 +21,13 @@ class SettingsController extends StateNotifier<GameSettings> {
     final settingsJson = _prefs.getString(_settingsKey);
     if (settingsJson != null) {
       try {
-        final settings = GameSettings.fromJson(
-          Map<String, dynamic>.from(
-            const GameSettings().toJson(),
-          ),
-        );
-        state = settings;
-      } catch (e) {
-        // If loading fails, keep default settings
-      }
+        state = GameSettings.fromJson(jsonDecode(settingsJson));
+      } catch (_) {}
     }
   }
 
   Future<void> _saveSettings() async {
-    await _prefs.setString(_settingsKey, state.toJson().toString());
+    await _prefs.setString(_settingsKey, jsonEncode(state.toJson()));
   }
 
   void toggleAnimations() {
@@ -65,6 +59,11 @@ class SettingsController extends StateNotifier<GameSettings> {
     final updatedControls = Map<String, String>.from(state.customControls);
     updatedControls[action] = control;
     state = state.copyWith(customControls: updatedControls);
+    _saveSettings();
+  }
+
+  void resetControls() {
+    state = state.copyWith(customControls: {});
     _saveSettings();
   }
 }

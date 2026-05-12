@@ -6,6 +6,7 @@ import '../controllers/game_controller.dart';
 import '../widgets/held_piece_display.dart';
 import '../widgets/upcoming_pieces_display.dart';
 import '../../domain/models/piece.dart';
+import '../../settings/presentation/controllers/settings_controller.dart';
 
 class GameScreen extends ConsumerStatefulWidget {
   const GameScreen({super.key});
@@ -27,6 +28,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
   Widget build(BuildContext context) {
     final gameState = ref.watch(gameControllerProvider);
     final controller = ref.read(gameControllerProvider.notifier);
+    final settings = ref.watch(settingsControllerProvider);
 
     return Scaffold(
       backgroundColor: Colors.black,
@@ -36,29 +38,28 @@ class _GameScreenState extends ConsumerState<GameScreen> {
         onKeyEvent: (node, event) {
           if (event is KeyDownEvent) {
             final logicalKey = event.logicalKey;
-            if (logicalKey == LogicalKeyboardKey.arrowLeft) {
+            if (_isKeyForAction(logicalKey, 'move_left', settings.customControls)) {
               controller.moveLeft();
               return KeyEventResult.handled;
-            } else if (logicalKey == LogicalKeyboardKey.arrowRight) {
+            } else if (_isKeyForAction(logicalKey, 'move_right', settings.customControls)) {
               controller.moveRight();
               return KeyEventResult.handled;
-            } else if (logicalKey == LogicalKeyboardKey.arrowUp) {
+            } else if (_isKeyForAction(logicalKey, 'rotate', settings.customControls)) {
               controller.rotate(clockwise: true);
               return KeyEventResult.handled;
-            } else if (logicalKey == LogicalKeyboardKey.arrowDown) {
+            } else if (_isKeyForAction(logicalKey, 'soft_drop', settings.customControls)) {
               controller.startSoftDrop();
               return KeyEventResult.handled;
-            } else if (logicalKey == LogicalKeyboardKey.space) {
+            } else if (_isKeyForAction(logicalKey, 'hard_drop', settings.customControls)) {
               controller.hardDrop();
               return KeyEventResult.handled;
-            } else if (logicalKey == LogicalKeyboardKey.keyC ||
-                logicalKey == LogicalKeyboardKey.shiftLeft ||
-                logicalKey == LogicalKeyboardKey.shiftRight) {
+            } else if (_isKeyForAction(logicalKey, 'hold', settings.customControls)) {
               controller.holdPiece();
               return KeyEventResult.handled;
             }
           } else if (event is KeyUpEvent) {
-            if (event.logicalKey == LogicalKeyboardKey.arrowDown) {
+            final logicalKey = event.logicalKey;
+            if (_isKeyForAction(logicalKey, 'soft_drop', settings.customControls)) {
               controller.endSoftDrop();
               return KeyEventResult.handled;
             }
@@ -268,6 +269,34 @@ class _GameScreenState extends ConsumerState<GameScreen> {
     ),
   );
 }
+
+  bool _isKeyForAction(
+    LogicalKeyboardKey key,
+    String action,
+    Map<String, String> customControls,
+  ) {
+    final mapped = customControls[action];
+    if (mapped == null) {
+      switch (action) {
+        case 'move_left':
+          return key == LogicalKeyboardKey.arrowLeft;
+        case 'move_right':
+          return key == LogicalKeyboardKey.arrowRight;
+        case 'rotate':
+          return key == LogicalKeyboardKey.arrowUp;
+        case 'soft_drop':
+          return key == LogicalKeyboardKey.arrowDown;
+        case 'hard_drop':
+          return key == LogicalKeyboardKey.space;
+        case 'hold':
+          return key == LogicalKeyboardKey.keyC ||
+              key == LogicalKeyboardKey.shiftLeft ||
+              key == LogicalKeyboardKey.shiftRight;
+      }
+      return false;
+    }
+    return key.keyLabel.toLowerCase() == mapped.toLowerCase();
+  }
 }
 
 class TouchAreaPainter extends CustomPainter {
