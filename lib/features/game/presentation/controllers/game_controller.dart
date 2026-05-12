@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/models/board.dart';
 import '../../domain/models/piece.dart';
+import '../../domain/services/dictionary_service.dart';
 import 'achievement_controller.dart';
 
 final gameControllerProvider = StateNotifierProvider<GameController, GameState>((ref) {
@@ -140,7 +141,8 @@ class GameController extends StateNotifier<GameState> {
     var newBoard = state.board.lockPiece();
 
     // Clear lines and calculate score
-    var result = newBoard.clearLinesAndCalculateScore();
+    final dictionaryService = _ref.read(dictionaryServiceProvider);
+    var result = newBoard.clearLinesAndCalculateScore(dictionaryService.isValidWord);
     newBoard = newBoard.copyWith(grid: result.newGrid);
     
     // Update score and lines cleared

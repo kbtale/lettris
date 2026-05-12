@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:math';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -20,30 +21,18 @@ class AchievementController extends StateNotifier<AchievementProgress> {
 
   Future<void> _loadProgress() async {
     final prefs = await SharedPreferences.getInstance();
-    
-    // Load achievements
-    final achievementsJson = prefs.getString(_achievementsKey);
-    if (achievementsJson != null) {
-      // Parse achievements and update state
-      // TODO: Implement JSON parsing
-    }
-
-    // Load progress
     final progressJson = prefs.getString(_progressKey);
     if (progressJson != null) {
-      // Parse progress and update state
-      // TODO: Implement JSON parsing
+      try {
+        state = AchievementProgress.fromJson(jsonDecode(progressJson));
+      } catch (_) {}
     }
-
-    // Check daily streak
     await _updateDailyStreak();
   }
 
   Future<void> _saveProgress() async {
     final prefs = await SharedPreferences.getInstance();
-    // TODO: Implement JSON serialization
-    // await prefs.setString(_achievementsKey, jsonEncode(state.achievements));
-    // await prefs.setString(_progressKey, jsonEncode(state.progress));
+    await prefs.setString(_progressKey, jsonEncode(state.toJson()));
   }
 
   Future<void> _updateDailyStreak() async {
