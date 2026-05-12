@@ -114,13 +114,6 @@ class SettingsScreen extends ConsumerWidget {
                             value: settings.touchSensitivity,
                             onChanged: controller.setTouchSensitivity,
                           ),
-                          const SizedBox(height: 24),
-                          Text(
-                            'Controls',
-                            style: Theme.of(context).textTheme.titleMedium,
-                          ),
-                          const SizedBox(height: 16),
-                          // TODO: Implement control customization UI
                         ],
                       ),
                     ),
