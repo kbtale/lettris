@@ -17,6 +17,7 @@ class GameState {
   final int level;
   final int linesCleared;
   final List<Piece> upcomingPieces;
+  final List<Position> lastClearedPositions;
 
   GameState({
     required this.board,
@@ -24,6 +25,7 @@ class GameState {
     this.level = 1,
     this.linesCleared = 0,
     this.upcomingPieces = const [],
+    this.lastClearedPositions = const [],
   });
 
   GameState copyWith({
@@ -32,6 +34,7 @@ class GameState {
     int? level,
     int? linesCleared,
     List<Piece>? upcomingPieces,
+    List<Position>? lastClearedPositions,
   }) {
     return GameState(
       board: board ?? this.board,
@@ -39,6 +42,7 @@ class GameState {
       level: level ?? this.level,
       linesCleared: linesCleared ?? this.linesCleared,
       upcomingPieces: upcomingPieces ?? this.upcomingPieces,
+      lastClearedPositions: lastClearedPositions ?? this.lastClearedPositions,
     );
   }
 }
@@ -63,9 +67,8 @@ class GameController extends StateNotifier<GameState> {
 
   void _generateNewPiece() {
     if (state.board.currentPiece == null) {
-      // Initial game start - get next piece and peek 5 upcoming pieces
-      final currentType = _pieceBag.nextPiece(); // Actually consume the first piece
-      final upcomingTypes = _pieceBag.peekNextNPieces(5); // Peek the next 5
+      final currentType = _pieceBag.nextPiece();
+      final upcomingTypes = _pieceBag.peekNextNPieces(5);
       
       final currentPiece = _createPiece(currentType);
       final upcomingPieces = upcomingTypes.map((type) => _createPiece(type)).toList();
@@ -73,27 +76,27 @@ class GameController extends StateNotifier<GameState> {
       state = state.copyWith(
         board: state.board.copyWith(currentPiece: currentPiece),
         upcomingPieces: upcomingPieces,
+        lastClearedPositions: const [],
       );
     } else {
-      // Check if next piece can be placed
       final nextPiece = state.upcomingPieces[0];
       if (!state.board.isValidMove(nextPiece.x, nextPiece.y, nextPiece.shape)) {
-        // Game over
         state = state.copyWith(
           board: state.board.copyWith(isGameOver: true),
+          lastClearedPositions: const [],
         );
         _gameLoop?.cancel();
         return;
       }
 
-      // Actually consume the next piece from the bag
-      _pieceBag.nextPiece(); // Consume the piece we're about to use
-      final newType = _pieceBag.nextPiece(); // Get a new piece for the end
+      _pieceBag.nextPiece();
+      final newType = _pieceBag.nextPiece();
       final newPiece = _createPiece(newType);
       
       state = state.copyWith(
         board: state.board.copyWith(currentPiece: nextPiece),
         upcomingPieces: [...state.upcomingPieces.skip(1), newPiece],
+        lastClearedPositions: const [],
       );
     }
   }
@@ -155,12 +158,11 @@ class GameController extends StateNotifier<GameState> {
         score: newScore,
         linesCleared: newLinesCleared,
         level: (newLinesCleared ~/ 10) + 1,
+        lastClearedPositions: result.clearedPositions,
       );
 
-      // Update achievements
       final achievementController = _ref.read(achievementControllerProvider.notifier);
       
-      // Track words formed
       if (result.words.isNotEmpty) {
         for (final word in result.words) {
           achievementController.onWordFormed(word);
@@ -169,15 +171,16 @@ class GameController extends StateNotifier<GameState> {
         print('Score gained: ${result.score}');
       }
 
-      // Track perfect lines
       if (result.linesCleared > 0) {
         achievementController.onPerfectLine();
       }
 
-      // Track total score
       achievementController.onScoreUpdate(newScore);
     } else {
-      state = state.copyWith(board: newBoard);
+      state = state.copyWith(
+        board: newBoard,
+        lastClearedPositions: const [],
+      );
     }
 
     _onPieceLocked();

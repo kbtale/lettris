@@ -15,13 +15,82 @@ class GameScreen extends ConsumerStatefulWidget {
   ConsumerState<GameScreen> createState() => _GameScreenState();
 }
 
-class _GameScreenState extends ConsumerState<GameScreen> {
+class _GameScreenState extends ConsumerState<GameScreen> with TickerProviderStateMixin {
   final FocusNode _focusNode = FocusNode();
+  late final Ticker _ticker;
+  final List<_Particle> _particles = [];
+  double _lastElapsedSeconds = 0.0;
+
+  @override
+  void initState() {
+    super.initState();
+    _ticker = createTicker(_onTick);
+    _ticker.start();
+  }
 
   @override
   void dispose() {
+    _ticker.dispose();
     _focusNode.dispose();
     super.dispose();
+  }
+
+  void _onTick(Duration elapsed) {
+    final currentElapsedSeconds = elapsed.inMicroseconds / 1000000.0;
+    double dt = currentElapsedSeconds - _lastElapsedSeconds;
+    if (dt < 0 || dt > 0.1) dt = 0.016;
+    _lastElapsedSeconds = currentElapsedSeconds;
+
+    if (_particles.isNotEmpty) {
+      setState(() {
+        for (var i = _particles.length - 1; i >= 0; i--) {
+          _particles[i].update(dt);
+          if (_particles[i].isDead) {
+            _particles.removeAt(i);
+          }
+        }
+      });
+    }
+  }
+
+  void _spawnParticles(List<Position> positions, double gameWidth, int cols) {
+    final random = Random();
+    final cellWidth = gameWidth / cols;
+
+    for (final pos in positions) {
+      final centerX = (pos.col + 0.5) * cellWidth;
+      final centerY = (pos.row + 0.5) * cellWidth;
+
+      for (var i = 0; i < 15; i++) {
+        final angle = random.nextDouble() * 2 * pi;
+        final speed = 100 + random.nextDouble() * 150;
+        final vx = cos(angle) * speed;
+        final vy = sin(angle) * speed - 50;
+
+        final size = 3 + random.nextDouble() * 5;
+        final maxLifetime = 0.5 + random.nextDouble() * 0.5;
+
+        final colors = [
+          Colors.orangeAccent,
+          Colors.yellowAccent,
+          Colors.cyanAccent,
+          Colors.pinkAccent,
+          Colors.purpleAccent,
+          Colors.white,
+        ];
+        final color = colors[random.nextInt(colors.length)];
+
+        _particles.add(_Particle(
+          x: centerX,
+          y: centerY,
+          vx: vx,
+          vy: vy,
+          color: color,
+          size: size,
+          maxLifetime: maxLifetime,
+        ));
+      }
+    }
   }
 
   @override
@@ -29,6 +98,17 @@ class _GameScreenState extends ConsumerState<GameScreen> {
     final gameState = ref.watch(gameControllerProvider);
     final controller = ref.read(gameControllerProvider.notifier);
     final settings = ref.watch(settingsControllerProvider);
+
+    final availableHeight = MediaQuery.of(context).size.height;
+    final boardHeightForWidth = availableHeight * 0.8;
+    final boardWidthForWidth = boardHeightForWidth * 0.5;
+    final gameWidth = min(boardWidthForWidth, MediaQuery.of(context).size.width * 0.85);
+
+    ref.listen(gameControllerProvider.select((s) => s.lastClearedPositions), (previous, next) {
+      if (next != null && next.isNotEmpty) {
+        _spawnParticles(next, gameWidth, gameState.board.cols);
+      }
+    });
 
     return Scaffold(
       backgroundColor: Colors.black,
@@ -72,12 +152,6 @@ class _GameScreenState extends ConsumerState<GameScreen> {
             // Calculate sizes based on available height
             final availableHeight = constraints.maxHeight;
             // Board should be 80% of available height
-            final boardHeight = availableHeight * 0.8;
-            // Width is half of height (maintaining 2:1 ratio)
-            final boardWidth = boardHeight * 0.5;
-            // Use the smaller of our calculated width or 85% of screen width
-            final gameWidth = min(boardWidth, constraints.maxWidth * 0.85);
-            
             return Center(
               child: Column(
                 children: [
@@ -221,6 +295,13 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                                           piece: gameState.board.currentPiece!,
                                           cellSize: gameWidth / gameState.board.cols,
                                           color: gameState.board.currentPiece!.color,
+                                        ),
+                                      ),
+                                    if (_particles.isNotEmpty)
+                                      IgnorePointer(
+                                        child: CustomPaint(
+                                          size: Size.infinite,
+                                          painter: ParticlePainter(_particles),
                                         ),
                                       ),
                                     // Game over overlay
@@ -404,6 +485,58 @@ class PiecePainter extends CustomPainter {
           }
         }
       }
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
+}
+
+class _Particle {
+  double x;
+  double y;
+  double vx;
+  double vy;
+  Color color;
+  double size;
+  double alpha;
+  final double maxLifetime;
+  double lifetime;
+
+  _Particle({
+    required this.x,
+    required this.y,
+    required this.vx,
+    required this.vy,
+    required this.color,
+    required this.size,
+    required this.maxLifetime,
+  })  : alpha = 1.0,
+        lifetime = maxLifetime;
+
+  void update(double dt) {
+    x += vx * dt;
+    y += vy * dt;
+    vy += 180 * dt;
+    lifetime -= dt;
+    alpha = max(0.0, lifetime / maxLifetime);
+  }
+
+  bool get isDead => lifetime <= 0;
+}
+
+class ParticlePainter extends CustomPainter {
+  final List<_Particle> particles;
+
+  ParticlePainter(this.particles);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    for (final particle in particles) {
+      final paint = Paint()
+        ..color = particle.color.withOpacity(particle.alpha)
+        ..style = PaintingStyle.fill;
+      canvas.drawCircle(Offset(particle.x, particle.y), particle.size, paint);
     }
   }
 
