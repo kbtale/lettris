@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dart:math';
@@ -5,18 +6,67 @@ import '../controllers/game_controller.dart';
 import '../widgets/held_piece_display.dart';
 import '../widgets/upcoming_pieces_display.dart';
 import '../../domain/models/piece.dart';
+import '../../settings/presentation/controllers/settings_controller.dart';
 
-class GameScreen extends ConsumerWidget {
+class GameScreen extends ConsumerStatefulWidget {
   const GameScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<GameScreen> createState() => _GameScreenState();
+}
+
+class _GameScreenState extends ConsumerState<GameScreen> {
+  final FocusNode _focusNode = FocusNode();
+
+  @override
+  void dispose() {
+    _focusNode.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final gameState = ref.watch(gameControllerProvider);
     final controller = ref.read(gameControllerProvider.notifier);
+    final settings = ref.watch(settingsControllerProvider);
 
     return Scaffold(
       backgroundColor: Colors.black,
-      body: SafeArea(
+      body: Focus(
+        focusNode: _focusNode,
+        autofocus: true,
+        onKeyEvent: (node, event) {
+          if (event is KeyDownEvent) {
+            final logicalKey = event.logicalKey;
+            if (_isKeyForAction(logicalKey, 'move_left', settings.customControls)) {
+              controller.moveLeft();
+              return KeyEventResult.handled;
+            } else if (_isKeyForAction(logicalKey, 'move_right', settings.customControls)) {
+              controller.moveRight();
+              return KeyEventResult.handled;
+            } else if (_isKeyForAction(logicalKey, 'rotate', settings.customControls)) {
+              controller.rotate(clockwise: true);
+              return KeyEventResult.handled;
+            } else if (_isKeyForAction(logicalKey, 'soft_drop', settings.customControls)) {
+              controller.startSoftDrop();
+              return KeyEventResult.handled;
+            } else if (_isKeyForAction(logicalKey, 'hard_drop', settings.customControls)) {
+              controller.hardDrop();
+              return KeyEventResult.handled;
+            } else if (_isKeyForAction(logicalKey, 'hold', settings.customControls)) {
+              controller.holdPiece();
+              return KeyEventResult.handled;
+            }
+          } else if (event is KeyUpEvent) {
+            final logicalKey = event.logicalKey;
+            if (_isKeyForAction(logicalKey, 'soft_drop', settings.customControls)) {
+              controller.endSoftDrop();
+              return KeyEventResult.handled;
+            }
+          }
+          return KeyEventResult.ignored;
+        },
+        child: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {
             // Calculate sizes based on available height
@@ -216,7 +266,36 @@ class GameScreen extends ConsumerWidget {
           },
         ),
       ),
-    );
+    ),
+  );
+}
+
+  bool _isKeyForAction(
+    LogicalKeyboardKey key,
+    String action,
+    Map<String, String> customControls,
+  ) {
+    final mapped = customControls[action];
+    if (mapped == null) {
+      switch (action) {
+        case 'move_left':
+          return key == LogicalKeyboardKey.arrowLeft;
+        case 'move_right':
+          return key == LogicalKeyboardKey.arrowRight;
+        case 'rotate':
+          return key == LogicalKeyboardKey.arrowUp;
+        case 'soft_drop':
+          return key == LogicalKeyboardKey.arrowDown;
+        case 'hard_drop':
+          return key == LogicalKeyboardKey.space;
+        case 'hold':
+          return key == LogicalKeyboardKey.keyC ||
+              key == LogicalKeyboardKey.shiftLeft ||
+              key == LogicalKeyboardKey.shiftRight;
+      }
+      return false;
+    }
+    return key.keyLabel.toLowerCase() == mapped.toLowerCase();
   }
 }
 
