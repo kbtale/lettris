@@ -102,26 +102,32 @@ class Board with _$Board {
       // Calculate total score with combinations
       int totalScore = ScoringSystem.calculateCombinationScore(wordScores);
 
-      // Clear cells involved in words
+      var clearedPositions = <Position>[];
       for (var match in wordMatches) {
         for (var pos in match.positions) {
           newGrid[pos.row][pos.col] = null;
+          clearedPositions.add(pos);
         }
       }
 
-      // Apply gravity
       newGrid = _applyGravity(newGrid);
 
       return ClearedLinesResult(
         newGrid,
         totalScore,
         wordMatches.map((m) => m.word).toList(),
-        0, // No lines cleared, only words
+        0,
+        clearedPositions,
       );
     }
 
-    // If no words found, check for complete lines
     var completeLinesResult = _clearCompleteLines(newGrid);
+    var lineClearedPositions = <Position>[];
+    for (var row in completeLinesResult.clearedLines) {
+      for (var col = 0; col < cols; col++) {
+        lineClearedPositions.add(Position(row, col));
+      }
+    }
     return ClearedLinesResult(
       completeLinesResult.grid,
       completeLinesResult.linesCleared > 0 
@@ -129,6 +135,7 @@ class Board with _$Board {
         : 0,
       [],
       completeLinesResult.linesCleared,
+      lineClearedPositions,
     );
   }
 
@@ -144,32 +151,29 @@ class Board with _$Board {
     
     // If no lines to clear, return the same grid
     if (clearedLines.isEmpty) {
-      return CompleteLinesResult(grid, 0);
+      return CompleteLinesResult(grid, 0, const []);
     }
     
-    // Create the new grid with cleared lines
     var resultGrid = List<List<CellData?>>.generate(
       rows,
       (i) => List<CellData?>.filled(cols, null),
       growable: false,
     );
     
-    // Copy non-cleared lines to new grid (from bottom to top)
     var sourceRow = rows - 1;
     var targetRow = rows - 1;
     
     while (sourceRow >= 0 && targetRow >= 0) {
       if (clearedLines.contains(sourceRow)) {
-        sourceRow--; // Skip this row as it was cleared
+        sourceRow--;
       } else {
-        // Copy the row
         resultGrid[targetRow] = List<CellData?>.from(grid[sourceRow]);
         sourceRow--;
         targetRow--;
       }
     }
     
-    return CompleteLinesResult(resultGrid, clearedLines.length);
+    return CompleteLinesResult(resultGrid, clearedLines.length, clearedLines);
   }
 
   List<WordMatch> _findWords(List<List<CellData?>> grid, bool Function(String) isValidWord) {
