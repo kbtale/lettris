@@ -2,11 +2,13 @@ import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dart:math';
+import 'package:flutter/scheduler.dart';
 import '../controllers/game_controller.dart';
 import '../widgets/held_piece_display.dart';
 import '../widgets/upcoming_pieces_display.dart';
 import '../../domain/models/piece.dart';
-import '../../settings/presentation/controllers/settings_controller.dart';
+import '../../domain/models/game_results.dart';
+import 'package:lettris/features/settings/presentation/controllers/settings_controller.dart';
 
 class GameScreen extends ConsumerStatefulWidget {
   const GameScreen({super.key});
@@ -105,7 +107,7 @@ class _GameScreenState extends ConsumerState<GameScreen> with TickerProviderStat
     final gameWidth = min(boardWidthForWidth, MediaQuery.of(context).size.width * 0.85);
 
     ref.listen(gameControllerProvider.select((s) => s.lastClearedPositions), (previous, next) {
-      if (next != null && next.isNotEmpty) {
+      if (next.isNotEmpty) {
         _spawnParticles(next, gameWidth, gameState.board.cols);
       }
     });
@@ -301,7 +303,7 @@ class _GameScreenState extends ConsumerState<GameScreen> with TickerProviderStat
                                       IgnorePointer(
                                         child: CustomPaint(
                                           size: Size.infinite,
-                                          painter: ParticlePainter(_particles),
+                                          painter: _ParticlePainter(_particles),
                                         ),
                                       ),
                                     // Game over overlay
@@ -383,9 +385,8 @@ class _GameScreenState extends ConsumerState<GameScreen> with TickerProviderStat
 class TouchAreaPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    // Hold piece area (top left)
     final holdPaint = Paint()
-      ..color = Colors.purple.withOpacity(0.3)
+      ..color = Colors.purple.withValues(alpha: 0.3)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2;
     canvas.drawRect(
@@ -393,9 +394,8 @@ class TouchAreaPainter extends CustomPainter {
       holdPaint,
     );
 
-    // 180° rotation area (top half)
     final rotatePaint = Paint()
-      ..color = Colors.yellow.withOpacity(0.3)
+      ..color = Colors.yellow.withValues(alpha: 0.3)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2;
     canvas.drawRect(
@@ -403,9 +403,8 @@ class TouchAreaPainter extends CustomPainter {
       rotatePaint,
     );
 
-    // CCW rotation area (bottom left)
     final ccwPaint = Paint()
-      ..color = Colors.blue.withOpacity(0.3)
+      ..color = Colors.blue.withValues(alpha: 0.3)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2;
     canvas.drawRect(
@@ -413,9 +412,8 @@ class TouchAreaPainter extends CustomPainter {
       ccwPaint,
     );
 
-    // CW rotation area (bottom right)
     final cwPaint = Paint()
-      ..color = Colors.green.withOpacity(0.3)
+      ..color = Colors.green.withValues(alpha: 0.3)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2;
     canvas.drawRect(
@@ -461,28 +459,26 @@ class PiecePainter extends CustomPainter {
           );
           canvas.drawRect(rect, paint);
 
-          // Draw letter if present
-          if (piece.letters[row][col] != null) {
-            textPainter.text = TextSpan(
-              text: piece.letters[row][col],
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: cellSize * 0.6,
-                fontWeight: FontWeight.bold,
-              ),
-            );
-            textPainter.layout(
-              minWidth: 0,
-              maxWidth: cellSize,
-            );
-            textPainter.paint(
-              canvas,
-              Offset(
-                (piece.x + col) * cellSize + (cellSize - textPainter.width) / 2,
-                (piece.y + row) * cellSize + (cellSize - textPainter.height) / 2,
-              ),
-            );
-          }
+          // Draw letter
+          textPainter.text = TextSpan(
+            text: piece.letters[row][col],
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: cellSize * 0.6,
+              fontWeight: FontWeight.bold,
+            ),
+          );
+          textPainter.layout(
+            minWidth: 0,
+            maxWidth: cellSize,
+          );
+          textPainter.paint(
+            canvas,
+            Offset(
+              (piece.x + col) * cellSize + (cellSize - textPainter.width) / 2,
+              (piece.y + row) * cellSize + (cellSize - textPainter.height) / 2,
+            ),
+          );
         }
       }
     }
@@ -525,18 +521,22 @@ class _Particle {
   bool get isDead => lifetime <= 0;
 }
 
-class ParticlePainter extends CustomPainter {
+class _ParticlePainter extends CustomPainter {
   final List<_Particle> particles;
 
-  ParticlePainter(this.particles);
+  _ParticlePainter(this.particles);
 
   @override
   void paint(Canvas canvas, Size size) {
     for (final particle in particles) {
       final paint = Paint()
-        ..color = particle.color.withOpacity(particle.alpha)
+        ..color = particle.color.withValues(alpha: particle.alpha)
         ..style = PaintingStyle.fill;
-      canvas.drawCircle(Offset(particle.x, particle.y), particle.size, paint);
+      canvas.drawCircle(
+        Offset(particle.x, particle.y),
+        particle.size,
+        paint,
+      );
     }
   }
 

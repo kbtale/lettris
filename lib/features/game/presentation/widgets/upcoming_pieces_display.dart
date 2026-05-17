@@ -29,7 +29,7 @@ class UpcomingPiecesDisplay extends StatelessWidget {
               decoration: BoxDecoration(
                 border: Border(
                   right: BorderSide(
-                    color: Colors.grey.withOpacity(0.3),
+                    color: Colors.grey.withValues(alpha: 0.3),
                     width: 1,
                   ),
                 ),
@@ -61,7 +61,7 @@ class UpcomingPiecesDisplay extends StatelessWidget {
                                       child: Padding(
                                         padding: EdgeInsets.all(cellSize * 0.2),
                                         child: Text(
-                                          piece.letters[i][j] ?? '',
+                                          piece.letters[i][j],
                                           style: TextStyle(
                                             color: Colors.white,
                                             fontSize: cellSize * 0.4,

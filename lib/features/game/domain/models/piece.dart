@@ -23,9 +23,6 @@ class TetrominoBag {
   TetrominoBag() {
     _fillAndShuffleBag(_currentBag);
     _fillAndShuffleBag(_nextBag);
-    print('Initial bags:');
-    print('Current: $_currentBag');
-    print('Next: $_nextBag');
   }
 
   void _fillAndShuffleBag(List<TetrominoType> bag) {
@@ -35,29 +32,21 @@ class TetrominoBag {
   }
 
   TetrominoType nextPiece() {
-    print('Before nextPiece - Current bag: $_currentBag');
     if (_currentBag.isEmpty) {
-      print('Current bag empty, swapping with next bag');
       _currentBag = List.from(_nextBag); // Create a new list to avoid reference issues
       _nextBag = [];
       _fillAndShuffleBag(_nextBag);
-      print('After swap - Current: $_currentBag, Next: $_nextBag');
     }
-    final piece = _currentBag.removeAt(0);
-    print('Returning piece: $piece, Remaining in current: $_currentBag');
-    return piece;
+    return _currentBag.removeAt(0);
   }
 
   List<TetrominoType> peekNextNPieces(int n) {
-    print('Peeking $n pieces');
     List<TetrominoType> pieces = [];
     List<TetrominoType> tempCurrentBag = List.from(_currentBag);
     List<TetrominoType> tempNextBag = List.from(_nextBag);
-    print('Temp bags - Current: $tempCurrentBag, Next: $tempNextBag');
 
     for (int i = 0; i < n; i++) {
       if (tempCurrentBag.isEmpty) {
-        print('Temp current bag empty, swapping with next');
         tempCurrentBag = List.from(tempNextBag);
         tempNextBag = [];
         _fillAndShuffleBag(tempNextBag);
@@ -65,7 +54,6 @@ class TetrominoBag {
       pieces.add(tempCurrentBag.removeAt(0));
     }
 
-    print('Peeked pieces: $pieces');
     return pieces;
   }
 }
@@ -224,29 +212,7 @@ class Piece with _$Piece {
 
   Color get color => colors[type]!;
 
-  // Helper function to get all points of a shape
-  static List<(int, int)> _getPoints(List<List<bool>> shape) {
-    final points = <(int, int)>[];
-    for (var r = 0; r < shape.length; r++) {
-      for (var c = 0; c < shape[0].length; c++) {
-        if (shape[r][c]) {
-          points.add((r, c));
-        }
-      }
-    }
-    return points;
-  }
 
-  // Helper function to convert points back to shape matrix
-  static List<List<bool>> _pointsToShape(List<(int, int)> points, int rows, int cols) {
-    final shape = List.generate(rows, (_) => List.filled(cols, false));
-    for (final point in points) {
-      if (point.$1 >= 0 && point.$1 < rows && point.$2 >= 0 && point.$2 < cols) {
-        shape[point.$1][point.$2] = true;
-      }
-    }
-    return shape;
-  }
 
   // Rotation offset data for JLSTZ pieces
   static const Map<int, List<(int, int)>> jlstzOffsetData = {
@@ -294,39 +260,24 @@ class Piece with _$Piece {
   }
 
   Piece rotate({bool clockwise = true, bool rotate180 = false}) {
-    print('\n=== ROTATE CALLED ===');
-    print('Type: $type');
-    print('Clockwise: $clockwise');
-    print('Rotate180: $rotate180');
-    print('Current rotation state: $rotationState');
-
     if (rotate180) {
-      // I, O, S, and Z pieces should remain the same in 180° rotation
       if (type == TetrominoType.I || type == TetrominoType.O || 
           type == TetrominoType.S || type == TetrominoType.Z) {
-        print('Skipping 180° rotation for piece type: $type');
         return this;
       }
-      print('Performing 180° rotation');
-      // For 180° rotation, rotate clockwise twice
       final firstRotation = rotate(clockwise: true);
       return firstRotation.rotate(clockwise: true);
     }
 
-    // Calculate new rotation state
     final newState = clockwise 
-        ? (rotationState + 1) % 4  // Clockwise: 0->1->2->3->0
-        : (rotationState + 3) % 4; // Counter-clockwise: 0->3->2->1->0
+        ? (rotationState + 1) % 4
+        : (rotationState + 3) % 4;
 
-    print('Attempting rotation from state $rotationState to $newState');
-
-    // Get the basic rotated shape and letters
     final rows = shape.length;
     final cols = shape[0].length;
     var newShape = List.generate(cols, (_) => List.filled(rows, false));
     var newLetters = List.generate(cols, (_) => List.filled(rows, ''));
 
-    // Perform rotation for both shape and letters
     for (var row = 0; row < rows; row++) {
       for (var col = 0; col < cols; col++) {
         if (clockwise) {
@@ -339,11 +290,6 @@ class Piece with _$Piece {
       }
     }
 
-    print('Shape before rotation:');
-    shape.forEach((row) => print(row));
-    print('Shape after rotation:');
-    newShape.forEach((row) => print(row));
-    
     return copyWith(
       shape: newShape,
       letters: newLetters,

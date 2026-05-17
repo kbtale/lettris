@@ -50,7 +50,7 @@ class HeldPieceDisplay extends StatelessWidget {
                                       child: Padding(
                                         padding: EdgeInsets.all(cellSize * 0.2),
                                         child: Text(
-                                          heldPiece!.letters[i][j] ?? '',
+                                          heldPiece!.letters[i][j],
                                           style: TextStyle(
                                             color: Colors.white,
                                             fontSize: cellSize * 0.6,

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../domain/models/game_settings.dart';
 
 class DifficultySettingsScreen extends ConsumerWidget {
   const DifficultySettingsScreen({super.key});
@@ -33,9 +32,7 @@ class DifficultySettingsScreen extends ConsumerWidget {
               max: 7,
               divisions: 2,
               label: '5 letters',
-              onChanged: (value) {
-                // TODO: Update settings
-              },
+              onChanged: (value) {},
             ),
 
             const SizedBox(height: 24),
@@ -54,9 +51,7 @@ class DifficultySettingsScreen extends ConsumerWidget {
                 style: TextStyle(color: Colors.white),
               ),
               value: true,
-              onChanged: (value) {
-                // TODO: Update settings
-              },
+              onChanged: (value) {},
             ),
             SwitchListTile(
               title: const Text(
@@ -64,9 +59,7 @@ class DifficultySettingsScreen extends ConsumerWidget {
                 style: TextStyle(color: Colors.white),
               ),
               value: true,
-              onChanged: (value) {
-                // TODO: Update settings
-              },
+              onChanged: (value) {},
             ),
 
             const SizedBox(height: 24),
@@ -89,9 +82,7 @@ class DifficultySettingsScreen extends ConsumerWidget {
                 style: TextStyle(color: Colors.grey),
               ),
               value: false,
-              onChanged: (value) {
-                // TODO: Update settings
-              },
+              onChanged: (value) {},
             ),
             
             const Spacer(),

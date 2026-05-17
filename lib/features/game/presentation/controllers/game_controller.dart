@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'dart:math';
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/models/board.dart';
 import '../../domain/models/piece.dart';
+import '../../domain/models/game_results.dart';
 import '../../domain/services/dictionary_service.dart';
 import 'achievement_controller.dart';
 
@@ -167,8 +167,6 @@ class GameController extends StateNotifier<GameState> {
         for (final word in result.words) {
           achievementController.onWordFormed(word);
         }
-        print('Words formed: ${result.words.join(", ")}');
-        print('Score gained: ${result.score}');
       }
 
       if (result.linesCleared > 0) {
@@ -191,29 +189,6 @@ class GameController extends StateNotifier<GameState> {
 
   void _onPieceLocked() {
     _canHold = true;  // Reset hold ability when piece is locked
-  }
-
-  int _countClearedLines(List<List<CellData?>> oldGrid, List<List<CellData?>> newGrid) {
-    int count = 0;
-    for (var row = 0; row < oldGrid.length; row++) {
-      if (oldGrid[row].every((cell) => cell != null) && 
-          newGrid[row].every((cell) => cell == null)) {
-        count++;
-      }
-    }
-    return count;
-  }
-
-  int _calculateScore(int linesCleared, int level) {
-    // Score multiplier increases with more lines cleared at once
-    final multiplier = switch (linesCleared) {
-      1 => 40,
-      2 => 100,
-      3 => 300,
-      4 => 1200,
-      _ => 0,
-    };
-    return multiplier * level;
   }
 
   void moveLeft() {

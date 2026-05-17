@@ -9,7 +9,6 @@ class AppTheme {
         primary: Colors.blue,
         secondary: Colors.lightBlue,
         surface: Color(0xFF162033),
-        background: Color(0xFF0A1929),
       ),
       textTheme: TextTheme(
         headlineLarge: const TextStyle(
@@ -28,12 +27,12 @@ class AppTheme {
         titleLarge: TextStyle(
           fontSize: 24,
           fontWeight: FontWeight.w600,
-          color: Colors.white.withOpacity(0.9),
+          color: Colors.white.withValues(alpha: 0.9),
           letterSpacing: 1.2,
         ),
         bodyLarge: TextStyle(
           fontSize: 16,
-          color: Colors.white.withOpacity(0.8),
+          color: Colors.white.withValues(alpha: 0.8),
           letterSpacing: 0.5,
         ),
       ),

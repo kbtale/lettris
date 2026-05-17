@@ -27,7 +27,7 @@ class SettingsSwitch extends StatelessWidget {
         trailing: Switch(
           value: value,
           onChanged: onChanged,
-          activeColor: Theme.of(context).colorScheme.primary,
+          activeThumbColor: Theme.of(context).colorScheme.primary,
         ),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),

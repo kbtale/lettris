@@ -24,7 +24,7 @@ class SettingsSlider extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Column(
         children: [
-          Row(
+          const Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text('Low'),
@@ -37,7 +37,7 @@ class SettingsSlider extends StatelessWidget {
               inactiveTrackColor: Colors.grey[700],
               thumbColor: Theme.of(context).colorScheme.primary,
               overlayColor:
-                  Theme.of(context).colorScheme.primary.withOpacity(0.2),
+                  Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
               trackHeight: 4,
             ),
             child: Slider(

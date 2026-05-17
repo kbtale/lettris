@@ -31,7 +31,7 @@ void main() {
         0,
       );
 
-      final word1 = 'TEST';
+      const word1 = 'TEST';
       final base1 = ScoringSystem.getBaseWordPoints(4);
       final letter1 = ScoringSystem.getLetterPoints(word1);
       expect(
@@ -45,7 +45,7 @@ void main() {
     });
 
     test('calculateWordScore vertical bonus', () {
-      final word = 'TEST';
+      const word = 'TEST';
       final base = ScoringSystem.getBaseWordPoints(4);
       final letter = ScoringSystem.getLetterPoints(word);
       final expected = ((base + letter) * 1.5).round();
@@ -60,7 +60,7 @@ void main() {
     });
 
     test('calculateWordScore perfect line bonus', () {
-      final word = 'TEST';
+      const word = 'TEST';
       final base = ScoringSystem.getBaseWordPoints(4);
       final letter = ScoringSystem.getLetterPoints(word);
       final expected = (base + letter) * 3 + 1000;
