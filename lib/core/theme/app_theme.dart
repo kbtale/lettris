@@ -4,11 +4,11 @@ class AppTheme {
   static ThemeData get darkTheme {
     return ThemeData.dark().copyWith(
       primaryColor: Colors.blue,
-      scaffoldBackgroundColor: const Color(0xFF0A1929),
+      scaffoldBackgroundColor: const Color(0xFF2D323F),
       colorScheme: const ColorScheme.dark(
         primary: Colors.blue,
         secondary: Colors.lightBlue,
-        surface: Color(0xFF162033),
+        surface: Color(0xFF2D323F),
       ),
       textTheme: TextTheme(
         headlineLarge: const TextStyle(
@@ -18,9 +18,9 @@ class AppTheme {
           letterSpacing: 8,
           shadows: [
             Shadow(
-              color: Colors.blue,
+              color: Colors.black.withValues(alpha: 0.5),
               blurRadius: 10,
-              offset: Offset(0, 0),
+              offset: const Offset(2, 2),
             ),
           ],
         ),
