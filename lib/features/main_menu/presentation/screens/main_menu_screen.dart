@@ -146,7 +146,6 @@ class MainMenuScreen extends ConsumerWidget {
             ],
           ),
         ),
-      ),
     );
   }
 }
