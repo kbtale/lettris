@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/styles/animated_background.dart';
-import '../../../../core/styles/glassmorphic_container.dart';
 import '../../../../core/styles/neumorphic_button.dart';
+import '../../../../core/styles/neumorphic_styles.dart';
 import '../../../achievements/presentation/screens/achievements_screen.dart';
 import '../../../game/presentation/screens/game_screen.dart';
 import '../../../game/presentation/screens/word_sets_screen.dart';
@@ -19,33 +19,17 @@ class MainMenuScreen extends ConsumerWidget {
     final controller = ref.read(mainMenuControllerProvider.notifier);
 
     return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Colors.blue.shade900,
-              Colors.purple.shade900,
-            ],
-          ),
-        ),
-        child: SafeArea(
-          child: Stack(
+      body: SafeArea(
+        child: Stack(
             children: [
               const AnimatedBackground(),
               Center(
-                child: GlassmorphicContainer(
-                  blur: 15,
-                  opacity: 0.1,
-                  borderRadius: BorderRadius.circular(30),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.blue.withValues(alpha: 0.2),
-                      blurRadius: 20,
-                      spreadRadius: 5,
-                    ),
-                  ],
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF2D323F),
+                    borderRadius: BorderRadius.circular(30),
+                    boxShadow: NeumorphicStyles.convexBoxShadow,
+                  ),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
