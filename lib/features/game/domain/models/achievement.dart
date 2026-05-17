@@ -41,7 +41,7 @@ class AchievementProgress with _$AchievementProgress {
       progress: {
         for (var type in AchievementType.values) type: 0
       },
-      achievements: [
+      achievements: const [
         // Word Formation Achievements
         Achievement(
           id: 'words_beginner',

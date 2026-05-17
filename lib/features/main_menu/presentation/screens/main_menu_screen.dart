@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/styles/animated_background.dart';
 import '../../../../core/styles/glassmorphic_container.dart';
 import '../../../../core/styles/neumorphic_button.dart';
-import '../../../../core/styles/neumorphic_styles.dart';
 import '../../../achievements/presentation/screens/achievements_screen.dart';
 import '../../../game/presentation/screens/game_screen.dart';
 import '../../../game/presentation/screens/word_sets_screen.dart';
@@ -42,7 +41,7 @@ class MainMenuScreen extends ConsumerWidget {
                   borderRadius: BorderRadius.circular(30),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.blue.withOpacity(0.2),
+                      color: Colors.blue.withValues(alpha: 0.2),
                       blurRadius: 20,
                       spreadRadius: 5,
                     ),

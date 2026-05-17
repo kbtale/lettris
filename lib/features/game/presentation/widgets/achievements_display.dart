@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../controllers/achievement_controller.dart';
-import '../../domain/models/achievement.dart';
 
 class AchievementsDisplay extends ConsumerWidget {
   const AchievementsDisplay({super.key});
@@ -12,7 +11,7 @@ class AchievementsDisplay extends ConsumerWidget {
 
     return Container(
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         color: Colors.black87,
         border: Border(
           left: BorderSide(

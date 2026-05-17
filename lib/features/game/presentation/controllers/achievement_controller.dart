@@ -9,7 +9,6 @@ final achievementControllerProvider = StateNotifierProvider<AchievementControlle
 });
 
 class AchievementController extends StateNotifier<AchievementProgress> {
-  static const _achievementsKey = 'achievements';
   static const _progressKey = 'achievement_progress';
   static const _lastPlayedKey = 'last_played_date';
   static const _streakKey = 'current_streak';

@@ -70,7 +70,7 @@ class WordSetsScreen extends ConsumerWidget {
                         borderRadius: BorderRadius.circular(15),
                         boxShadow: [
                           BoxShadow(
-                            color: (isActive ? Colors.green : Colors.blue).withOpacity(0.2),
+                            color: (isActive ? Colors.green : Colors.blue).withValues(alpha: 0.2),
                             blurRadius: 10,
                             spreadRadius: 2,
                           ),

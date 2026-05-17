@@ -8,11 +8,12 @@ part 'board.freezed.dart';
 part 'board.g.dart';
 
 Color? _colorFromJson(int? value) => value == null ? null : Color(value);
-int? _colorToJson(Color? color) => color?.value;
+int? _colorToJson(Color? color) => color?.toARGB32();
 
 @freezed
 class CellData with _$CellData {
   const factory CellData({
+    // ignore: invalid_annotation_target
     @JsonKey(fromJson: _colorFromJson, toJson: _colorToJson) Color? color,
     String? letter,
   }) = _CellData;
