@@ -66,7 +66,7 @@ class GameController extends StateNotifier<GameState> {
   }
 
   void _generateNewPiece() {
-    if (state.board.currentPiece == null) {
+    if (state.upcomingPieces.isEmpty) {
       final currentType = _pieceBag.nextPiece();
       final upcomingTypes = _pieceBag.peekNextNPieces(5);
       
