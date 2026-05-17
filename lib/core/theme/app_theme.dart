@@ -11,7 +11,7 @@ class AppTheme {
         surface: Color(0xFF2D323F),
       ),
       textTheme: TextTheme(
-        headlineLarge: const TextStyle(
+        headlineLarge: TextStyle(
           fontSize: 48,
           fontWeight: FontWeight.bold,
           color: Colors.white,
