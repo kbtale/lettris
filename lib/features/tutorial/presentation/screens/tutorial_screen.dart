@@ -132,12 +132,20 @@ T-spins are special moves that can be performed with T-shaped pieces:
                               child: Markdown(
                                 data: _pages[_currentPage].content,
                                 styleSheet: MarkdownStyleSheet(
+                                  blockSpacing: 10.0,
                                   h1: Theme.of(context)
                                       .textTheme
                                       .titleLarge!
-                                      .copyWith(color: Colors.blue),
-                                  h2: Theme.of(context).textTheme.titleMedium,
-                                  p: Theme.of(context).textTheme.bodyLarge,
+                                      .copyWith(
+                                        color: Colors.blue,
+                                        fontSize: 24,
+                                      ),
+                                  h2: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                        fontSize: 18,
+                                      ),
+                                  p: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                        height: 1.5,
+                                      ),
                                 ),
                               ),
                             ),
