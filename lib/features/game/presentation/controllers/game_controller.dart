@@ -82,7 +82,10 @@ class GameController extends StateNotifier<GameState> {
       final nextPiece = state.upcomingPieces[0];
       if (!state.board.isValidMove(nextPiece.x, nextPiece.y, nextPiece.shape)) {
         state = state.copyWith(
-          board: state.board.copyWith(isGameOver: true),
+          board: state.board.copyWith(
+            isGameOver: true,
+            currentPiece: null,
+          ),
           lastClearedPositions: const [],
         );
         _gameLoop?.cancel();
@@ -192,7 +195,7 @@ class GameController extends StateNotifier<GameState> {
   }
 
   void moveLeft() {
-    if (state.board.currentPiece == null) return;
+    if (state.board.isGameOver || state.board.currentPiece == null) return;
 
     final currentPiece = state.board.currentPiece!;
     final newX = currentPiece.x - 1;
@@ -207,7 +210,7 @@ class GameController extends StateNotifier<GameState> {
   }
 
   void moveRight() {
-    if (state.board.currentPiece == null) return;
+    if (state.board.isGameOver || state.board.currentPiece == null) return;
 
     final currentPiece = state.board.currentPiece!;
     final newX = currentPiece.x + 1;
@@ -252,8 +255,9 @@ class GameController extends StateNotifier<GameState> {
   }
 
   void rotate({bool clockwise = true, bool rotate180 = false}) {
-    final currentPiece = state.board.currentPiece;
-    if (currentPiece == null) return;
+    if (state.board.isGameOver || state.board.currentPiece == null) return;
+
+    final currentPiece = state.board.currentPiece!;
 
     List<List<bool>> rotatedShape;
     List<List<String>> rotatedLetters;
@@ -292,7 +296,7 @@ class GameController extends StateNotifier<GameState> {
   }
 
   void holdPiece() {
-    if (!_canHold || state.board.currentPiece == null) return;
+    if (state.board.isGameOver || !_canHold || state.board.currentPiece == null) return;
 
     final currentPiece = state.board.currentPiece;
     final heldPiece = state.board.heldPiece;
@@ -320,7 +324,7 @@ class GameController extends StateNotifier<GameState> {
   }
 
   void hardDrop() {
-    if (_hardDropInProgress || state.board.currentPiece == null) return;
+    if (state.board.isGameOver || _hardDropInProgress || state.board.currentPiece == null) return;
     _hardDropInProgress = true;
 
     final shadowPiece = state.board.getShadowPiece();
