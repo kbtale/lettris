@@ -80,17 +80,6 @@ class GameController extends StateNotifier<GameState> {
       );
     } else {
       final nextPiece = state.upcomingPieces[0];
-      if (!state.board.isValidMove(nextPiece.x, nextPiece.y, nextPiece.shape)) {
-        state = state.copyWith(
-          board: state.board.copyWith(
-            isGameOver: true,
-            currentPiece: null,
-          ),
-          lastClearedPositions: const [],
-        );
-        _gameLoop?.cancel();
-        return;
-      }
 
       _pieceBag.nextPiece();
       final newType = _pieceBag.nextPiece();
@@ -143,12 +132,9 @@ class GameController extends StateNotifier<GameState> {
   void _lockPieceAndUpdate() {
     if (state.board.currentPiece == null) return;
 
-    final currentPiece = state.board.currentPiece!;
-
-    // Lock the piece
     var newBoard = state.board.lockPiece();
 
-    if (currentPiece.y <= 0) {
+    if (newBoard.grid[0].any((cell) => cell != null)) {
       state = state.copyWith(
         board: newBoard.copyWith(isGameOver: true),
       );
