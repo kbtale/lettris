@@ -143,8 +143,18 @@ class GameController extends StateNotifier<GameState> {
   void _lockPieceAndUpdate() {
     if (state.board.currentPiece == null) return;
 
+    final currentPiece = state.board.currentPiece!;
+
     // Lock the piece
     var newBoard = state.board.lockPiece();
+
+    if (currentPiece.y <= 0) {
+      state = state.copyWith(
+        board: newBoard.copyWith(isGameOver: true),
+      );
+      _gameLoop?.cancel();
+      return;
+    }
 
     // Clear lines and calculate score
     final dictionaryService = _ref.read(dictionaryServiceProvider);
