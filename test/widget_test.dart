@@ -13,6 +13,8 @@ void main() {
       ),
     );
 
+    await tester.pump(const Duration(seconds: 1));
+
     expect(find.text('LETTRIS'), findsOneWidget);
     expect(find.text('Start Game'), findsOneWidget);
     expect(find.text('Tutorial'), findsOneWidget);

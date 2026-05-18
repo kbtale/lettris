@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'neumorphic_styles.dart';
 
 class NeumorphicButton extends StatefulWidget {
   final VoidCallback? onPressed;
@@ -44,20 +45,7 @@ class _NeumorphicButtonState extends State<NeumorphicButton> {
             borderRadius: BorderRadius.circular(15),
             boxShadow: _isPressed
                 ? []
-                : [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.3),
-                      offset: const Offset(4, 4),
-                      blurRadius: 15,
-                      spreadRadius: 1,
-                    ),
-                    BoxShadow(
-                      color: Colors.blue.withValues(alpha: 0.1),
-                      offset: const Offset(-4, -4),
-                      blurRadius: 15,
-                      spreadRadius: 1,
-                    ),
-                  ],
+                : NeumorphicStyles.concaveBoxShadow,
           ),
           child: Center(
             child: widget.isLoading
