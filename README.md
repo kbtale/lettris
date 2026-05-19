@@ -1,16 +1,21 @@
 # lettris
 
-A new Flutter project.
+A small Flutter project.
 
-## Getting Started
+Quick start
 
-This project is a starting point for a Flutter application.
+```powershell
+flutter pub get
+flutter run
+flutter test
+```
 
-A few resources to get you started if this is your first Flutter project:
+VS Code
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+- Install Flutter and Dart extensions
+- Pick a device in the status bar
+- Use the Testing panel to run tests
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Troubleshooting
+
+Run `flutter doctor` and fix any reported issues.
